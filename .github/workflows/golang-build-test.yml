@@ -1,4 +1,4 @@
-name: Golang build and test
+name: build-test
 
 on: [push]
 
@@ -17,11 +17,9 @@ jobs:
       - name: Build
         run: CGO_ENABLED=0 go build -v -ldflags "-extldflags=-static" ./...
       - name: Test
-        run: go test -v ./...
+        run: go test -v -coverprofile=coverage.out -covermode=count ./...
       - name: Coverage
-        run: |
-          go test -coverprofile=coverage.out -covermode=count  ./...; go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'
-        # shell: bash
+        run: @go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'
       - name: Go Format
         run: gofmt -s -w . && git diff --exit-code
       - name: Go Vet
@@ -32,7 +30,13 @@ jobs:
         run: go mod download
       - name: Go Mod Verify
         run: go mod verify
-
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        continue-on-error: true  # we don't care if it fails
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}  # set in repository settings
+          file: ./coverage.out  # file from the previous step
+          fail_ci_if_error: false
       # - name: Test with Go
       #   run: go test -json > TestResults.json
       # - name: Upload Go test results
