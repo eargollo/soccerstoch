@@ -19,7 +19,7 @@ jobs:
       - name: Test
         run: go test -v -coverprofile=coverage.out -covermode=count ./...
       - name: Coverage
-        run: @go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'
+        run: go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'
       - name: Go Format
         run: gofmt -s -w . && git diff --exit-code
       - name: Go Vet
