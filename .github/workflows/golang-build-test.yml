@@ -1,0 +1,46 @@
+name: build-test
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20.x'
+      - name: Install dependencies
+        run: go get ./...
+      - name: Build
+        run: CGO_ENABLED=0 go build -v -ldflags "-extldflags=-static" ./...
+      - name: Test
+        run: go test -v -coverprofile=coverage.out -covermode=count ./...
+      - name: Coverage
+        run: go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'
+      - name: Go Format
+        run: gofmt -s -w . && git diff --exit-code
+      - name: Go Vet
+        run: go vet ./...
+      - name: Go Tidy
+        run: go mod tidy && git diff --exit-code
+      - name: Go Mod
+        run: go mod download
+      - name: Go Mod Verify
+        run: go mod verify
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        continue-on-error: true  # we don't care if it fails
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}  # set in repository settings
+          file: ./coverage.out  # file from the previous step
+          fail_ci_if_error: false
+      # - name: Test with Go
+      #   run: go test -json > TestResults.json
+      # - name: Upload Go test results
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: Go-results
+      #     path: TestResults.json
