@@ -9,8 +9,8 @@ Soccer Stochastic analysis
 Overall idea is to get a stochastic analysis for soccer championships in order to tell the probability of a team to be champion, to qualify to the upper league, or to be relegated.
 
 Very early stages now. Work to do:
-[ ] (WIP) Set up CI 
-[ ] List championships
-[ ] Get matches
-[ ] First simulation on pending matches
+- [ ] (WIP) Set up CI 
+- [ ] List championships
+- [ ] Get matches
+- [ ] First simulation on pending matches
 
