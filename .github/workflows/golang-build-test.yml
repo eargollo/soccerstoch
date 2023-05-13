@@ -15,11 +15,22 @@ jobs:
       - name: Install dependencies
         run: go get .
       - name: Build
-        run: make build
+        run: CGO_ENABLED=0 go build -v -ldflags "-extldflags=-static" ./...
       - name: Test
-        run: make test
+        run: go test -v ./...
       - name: Coverage
         run: make cover
+      - name: Go Format
+        run: gofmt -s -w . && git diff --exit-code
+      - name: Go Vet
+        run: go vet ./...
+      - name: Go Tidy
+        run: go mod tidy && git diff --exit-code
+      - name: Go Mod
+        run: go mod download
+      - name: Go Mod Verify
+        run: go mod verify
+
       # - name: Test with Go
       #   run: go test -json > TestResults.json
       # - name: Upload Go test results
