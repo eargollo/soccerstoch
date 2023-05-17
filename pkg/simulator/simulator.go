@@ -1,5 +1,7 @@
 package simulator
 
+import "sort"
+
 type Simulator struct {
 	provider ChampionshipProvicer
 	points   PointsMap
@@ -66,6 +68,15 @@ func NewRank(stats TeamsStats, points PointsMap) *ChampionshipRank {
 
 		rank = append(rank, tr)
 	}
+
+	sort.Slice(rank, func(i, j int) bool {
+		return rank[i].Points > rank[j].Points
+	})
+
+	for i := range rank {
+		rank[i].Rank = i + 1
+	}
+
 	return &rank
 }
 

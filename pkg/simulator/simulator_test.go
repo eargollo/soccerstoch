@@ -148,6 +148,26 @@ func TestNewRank(t *testing.T) {
 				simulator.TeamRank{Rank: 1, ID: "A", Points: 31, TeamStat: simulator.TeamStat{HomeWins: 5, HomeDraws: 3, HomeLosses: 8, AwayWins: 2, AwayDraws: 7, AwayLosses: 8}},
 			},
 		},
+		{
+			name: "Rank",
+			args: args{
+				stats: simulator.TeamsStats{
+					"A": simulator.TeamStat{HomeWins: 5},
+					"B": simulator.TeamStat{HomeWins: 8},
+					"C": simulator.TeamStat{HomeWins: 1},
+					"D": simulator.TeamStat{HomeWins: 0},
+					"E": simulator.TeamStat{HomeWins: 3},
+				},
+				points: simulator.PointsMap{2, 1, 0},
+			},
+			want: &simulator.ChampionshipRank{
+				simulator.TeamRank{Rank: 1, ID: "B", Points: 16, TeamStat: simulator.TeamStat{HomeWins: 8}},
+				simulator.TeamRank{Rank: 2, ID: "A", Points: 10, TeamStat: simulator.TeamStat{HomeWins: 5}},
+				simulator.TeamRank{Rank: 3, ID: "E", Points: 6, TeamStat: simulator.TeamStat{HomeWins: 3}},
+				simulator.TeamRank{Rank: 4, ID: "C", Points: 2, TeamStat: simulator.TeamStat{HomeWins: 1}},
+				simulator.TeamRank{Rank: 5, ID: "D", Points: 0, TeamStat: simulator.TeamStat{HomeWins: 0}},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
