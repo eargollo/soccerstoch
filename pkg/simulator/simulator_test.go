@@ -84,11 +84,8 @@ func TestTeamsStats_AddMatch(t *testing.T) {
 		wantTs  *simulator.TeamsStats
 	}{
 		{
-			name: "Home wins",
-			ts: &simulator.TeamsStats{
-				"A": simulator.TeamStat{},
-				"B": simulator.TeamStat{},
-			},
+			name:    "Home wins",
+			ts:      &simulator.TeamsStats{},
 			arg:     simulator.Match{LocalID: "A", AwayID: "B", LocalScore: 3, AwayScore: 2},
 			wantErr: false,
 			wantTs: &simulator.TeamsStats{
@@ -97,11 +94,8 @@ func TestTeamsStats_AddMatch(t *testing.T) {
 			},
 		},
 		{
-			name: "Draw",
-			ts: &simulator.TeamsStats{
-				"A": simulator.TeamStat{},
-				"B": simulator.TeamStat{},
-			},
+			name:    "Draw",
+			ts:      &simulator.TeamsStats{},
 			arg:     simulator.Match{LocalID: "A", AwayID: "B", LocalScore: 8, AwayScore: 8},
 			wantErr: false,
 			wantTs: &simulator.TeamsStats{
@@ -110,11 +104,8 @@ func TestTeamsStats_AddMatch(t *testing.T) {
 			},
 		},
 		{
-			name: "Away wins",
-			ts: &simulator.TeamsStats{
-				"A": simulator.TeamStat{},
-				"B": simulator.TeamStat{},
-			},
+			name:    "Away wins",
+			ts:      &simulator.TeamsStats{},
 			arg:     simulator.Match{LocalID: "A", AwayID: "B", LocalScore: 3, AwayScore: 5},
 			wantErr: false,
 			wantTs: &simulator.TeamsStats{
@@ -130,6 +121,38 @@ func TestTeamsStats_AddMatch(t *testing.T) {
 			}
 			if !reflect.DeepEqual(tt.ts, tt.wantTs) {
 				t.Errorf("simulation with 3 teams = %v, want %v", tt.ts, tt.wantTs)
+			}
+		})
+	}
+}
+
+func TestNewRank(t *testing.T) {
+	type args struct {
+		stats  simulator.TeamsStats
+		points simulator.PointsMap
+	}
+	tests := []struct {
+		name string
+		args args
+		want *simulator.ChampionshipRank
+	}{
+		{
+			name: "Calculate points",
+			args: args{
+				stats: simulator.TeamsStats{
+					"A": simulator.TeamStat{HomeWins: 5, HomeDraws: 3, HomeLosses: 8, AwayWins: 2, AwayDraws: 7, AwayLosses: 8},
+				},
+				points: simulator.PointsMap{3, 1, 0},
+			},
+			want: &simulator.ChampionshipRank{
+				simulator.TeamRank{Rank: 1, ID: "A", Points: 31, TeamStat: simulator.TeamStat{HomeWins: 5, HomeDraws: 3, HomeLosses: 8, AwayWins: 2, AwayDraws: 7, AwayLosses: 8}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := simulator.NewRank(tt.args.stats, tt.args.points); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewRank() = %v, want %v", got, tt.want)
 			}
 		})
 	}

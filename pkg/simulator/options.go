@@ -3,7 +3,7 @@ package simulator
 type SimulatorOption func(*Simulator)
 
 var defaults = []SimulatorOption{
-	WithPointSystem(3, 1, 0),
+	WithPointSystem(PointsMap{Win: 3, Draw: 1, Loss: 0}),
 }
 
 func WithChampionshipProvider(prov ChampionshipProvicer) SimulatorOption {
@@ -12,10 +12,8 @@ func WithChampionshipProvider(prov ChampionshipProvicer) SimulatorOption {
 	}
 }
 
-func WithPointSystem(win int, draw int, loss int) SimulatorOption {
+func WithPointSystem(points PointsMap) SimulatorOption {
 	return func(s *Simulator) {
-		s.points.win = win
-		s.points.draw = draw
-		s.points.loss = loss
+		s.points = points
 	}
 }

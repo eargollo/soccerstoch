@@ -2,11 +2,13 @@ package simulator
 
 type Simulator struct {
 	provider ChampionshipProvicer
-	points   struct {
-		win  int
-		draw int
-		loss int
-	}
+	points   PointsMap
+}
+
+type PointsMap struct {
+	Win  int
+	Draw int
+	Loss int
 }
 
 func New(options ...SimulatorOption) *Simulator {
@@ -42,11 +44,30 @@ type TeamsStats map[string]TeamStat
 
 type TeamRank struct {
 	Rank   int
+	ID     string
+	Name   string
 	Points int
-	*TeamStat
+	TeamStat
 }
 
 type ChampionshipRank []TeamRank
+
+func NewRank(stats TeamsStats, points PointsMap) *ChampionshipRank {
+	rank := ChampionshipRank{}
+
+	for id, stat := range stats {
+		tr := TeamRank{}
+		tr.TeamStat = stat
+		tr.ID = id
+		tr.Rank = 1
+		tr.Points = (stat.HomeWins+stat.AwayWins)*points.Win +
+			(stat.HomeDraws+stat.AwayDraws)*points.Draw +
+			(stat.HomeLosses+stat.AwayLosses)*points.Loss
+
+		rank = append(rank, tr)
+	}
+	return &rank
+}
 
 func (ts TeamsStats) AddMatch(m Match) error {
 	local := ts[m.LocalID]
